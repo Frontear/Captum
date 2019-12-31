@@ -135,3 +135,6 @@ gradle-app.setting
 
 ### Fabric ###
 run/
+
+### Lombok ###
+lombok.config
