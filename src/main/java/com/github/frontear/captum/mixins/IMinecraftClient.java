@@ -1,4 +1,4 @@
-package com.github.frontear.themelio.mixins;
+package com.github.frontear.captum.mixins;
 
 import org.apache.logging.log4j.Logger;
 

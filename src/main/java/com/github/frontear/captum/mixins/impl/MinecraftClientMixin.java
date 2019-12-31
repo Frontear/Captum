@@ -1,6 +1,6 @@
-package com.github.frontear.themelio.mixins.impl;
+package com.github.frontear.captum.mixins.impl;
 
-import com.github.frontear.themelio.mixins.IMinecraftClient;
+import com.github.frontear.captum.mixins.IMinecraftClient;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.*;
