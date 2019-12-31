@@ -1,0 +1,75 @@
+import groovy.json.JsonSlurper
+
+plugins {
+    id "fabric-loom" version "0.2.6-SNAPSHOT"
+    id "java"
+}
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+archivesBaseName = mod_name
+version = mod_version
+group = mod_group
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+}
+
+processResources {
+    final props = [ "id": mod_name.toLowerCase(), "version": mod_version, "group": mod_group, "name": mod_name, "description": mod_description, "author": mod_author, "loader": loader_version, "minecraft": minecraft_version ]
+    final files = [ "fabric.mod.json", "mixins.${props.id}.json" ]
+
+    inputs.properties props
+
+    from (sourceSets.main.resources.srcDirs) {
+        include files
+        expand props
+    }
+
+    from (sourceSets.main.resources.srcDirs) {
+        exclude files
+    }
+}
+
+wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = "6.0.1"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+/**
+ * Usage: ./gradlew update
+ */
+tasks.register("update") {
+    group = "Themelio"
+    description = "Updates the fabric dependencies to their latest revision"
+
+    doLast {
+        final props = [:]
+        final latest = new JsonSlurper().parse(new URL("https://meta.fabricmc.net/v1/versions/game"))[0]["version"]
+        final meta = new JsonSlurper().parse(new URL("https://meta.fabricmc.net/v1/versions/loader/$latest"))[0]
+
+        props["minecraft_version"] = latest
+        props["loader_version"] = meta["loader"]["version"]
+        props["yarn_mappings"] = meta["mappings"]["version"]
+
+        final prop_file = file("gradle.properties")
+        final lines = prop_file.readLines()
+
+        prop_file.withWriter { writer ->
+            lines.each { line ->
+                def split = line.split(" = ")[0]
+
+                if (props.containsKey(split)) {
+                    line = "$split = ${props[split]}"
+                }
+
+                writer.writeLine(line)
+            }
+        }
+    }
+}
